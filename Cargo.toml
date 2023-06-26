@@ -1,5 +1,5 @@
 [package]
-name = "image_converter"
+name = "convert_image"
 version = "0.1.0"
 edition = "2018"
 
@@ -11,7 +11,9 @@ webp = "0.2.2"
 clap = "4.3.6"
 
 [profile.release]
+opt-level = "z"
 strip = true
 lto = true
+codegen-units = 1
 panic = "abort"
 
