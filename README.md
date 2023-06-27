@@ -9,3 +9,6 @@
 
 ## Example
 `image_converter /path/to/image.png -q80 -ewebp -w80 -a60`
+
+## Build
+simple command, as for every rust build: `cargo build --release`
