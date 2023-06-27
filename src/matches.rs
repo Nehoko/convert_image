@@ -86,11 +86,12 @@ impl Matcher {
     }
 
     fn read_dimensions(matcher: &ArgMatches) -> Option<(u32, u32)> {
-        let width = matcher.get_one::<u32>("width");
-        let height = matcher.get_one::<u32>("height");
+        let width = matcher.get_one::<String>("width");
+        let height = matcher.get_one::<String>("height");
 
         match width.is_some() && height.is_some() {
-            true => Some((*width.unwrap(), *height.unwrap())),
+            true => Some((width.unwrap().parse::<u32>().unwrap(),
+                          height.unwrap().parse::<u32>().unwrap())),
             false => None
         }
     }
