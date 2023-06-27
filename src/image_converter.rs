@@ -3,7 +3,7 @@ use std::io::{BufWriter, Write};
 
 use image::{DynamicImage, GenericImageView, ImageFormat, ImageOutputFormat};
 use image::imageops::FilterType;
-use webp::{Encoder, PixelLayout, WebPMemory};
+use webp::{Encoder, WebPMemory};
 
 use crate::matches::Matcher;
 
@@ -44,8 +44,8 @@ impl ImageConverter {
     }
 
     fn convert_to_webp(&self) -> &String {
-        let (width, height) = self.dimensions;
-        let encoder: Encoder = Encoder::new(self.img.as_bytes(), PixelLayout::Rgba, width, height);
+        let img = self.resize_image();
+        let encoder: Encoder = Encoder::from_image(&img).unwrap();
         let webp: WebPMemory = encoder.encode(self.quality as f32);
         let mut file = File::create(&self.output_file_name).unwrap();
         file.write_all(&webp).unwrap();
