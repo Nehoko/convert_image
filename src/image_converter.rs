@@ -1,5 +1,7 @@
+use std::ffi::OsStr;
 use std::fs::File;
 use std::io::{BufWriter, Write};
+use std::path::Path;
 
 use image::{DynamicImage, GenericImageView, ImageFormat, ImageOutputFormat};
 use image::imageops::FilterType;
@@ -19,7 +21,7 @@ impl ImageConverter {
     pub fn new(matcher: &Matcher) -> ImageConverter {
         ImageConverter {
             img: matcher.get_image().clone(),
-            output_file_name: ImageConverter::format_file_name(matcher.get_input_file(), matcher.get_extension()),
+            output_file_name: ImageConverter::format_file_name(matcher.get_input_file_path(), matcher.get_extension()),
             dimensions: matcher.get_dimensions().unwrap_or(matcher.get_image().dimensions()),
             quality: matcher.get_quality(),
             extension: String::from(matcher.get_extension()),
@@ -80,7 +82,29 @@ impl ImageConverter {
         self.img.resize(width, height, FilterType::Lanczos3)
     }
 
-    fn format_file_name(input_file_name: &String, extension: &str) -> String {
-        format!("{}.{}", input_file_name, extension)
+    fn format_file_name(input_file_path: &String, extension: &str) -> String {
+        let path = Path::new(input_file_path);
+        let input_extension = path
+            .extension()
+            .and_then(OsStr::to_str)
+            .unwrap_or("");
+        let suggested_file_name = &input_file_path
+            .strip_suffix(format!(".{}", input_extension).as_str())
+            .unwrap_or(input_file_path)
+            .to_string();
+        let file_name = ImageConverter::new_file_name(suggested_file_name, extension);
+        format!("{}.{}", file_name, extension)
+    }
+
+    fn new_file_name(input_file_name: &String, extension: &str) -> String {
+        let file_path = format!("{}.{}", input_file_name, extension);
+        let path = Path::new(file_path.as_str());
+
+        if path.exists() {
+            let file_name = format!("{}_new", input_file_name);
+            ImageConverter::new_file_name(&file_name, extension)
+        } else {
+            String::from(input_file_name)
+        }
     }
 }

@@ -2,7 +2,7 @@ use clap::{Arg, ArgAction, ArgMatches, Command};
 use image::DynamicImage;
 
 pub struct Matcher {
-    input_file: String,
+    input_file_path: String,
     extension: String,
     image: DynamicImage,
     quality: u8,
@@ -48,13 +48,13 @@ impl Matcher {
                 .action(ArgAction::Set))
             .get_matches();
 
-        let (input_file_path, input_file) = Matcher::get_file_name_tuple(&arg_matches);
+        let (input_file_path, _input_file_name) = Matcher::get_file_name_tuple(&arg_matches);
         let image = Matcher::read_image(&input_file_path);
         let quality = Matcher::read_quality(&arg_matches);
         let dimensions = Matcher::read_dimensions(&arg_matches);
         let extension = Matcher::read_convert_extension(&arg_matches);
 
-        Matcher { input_file, extension, image, quality, dimensions }
+        Matcher { input_file_path, extension, image, quality, dimensions }
     }
 
     fn get_file_name_tuple(matcher: &ArgMatches) -> (String, String) {
@@ -102,8 +102,8 @@ impl Matcher {
             .to_string()
     }
 
-    pub fn get_input_file(&self) -> &String {
-        &self.input_file
+    pub fn get_input_file_path(&self) -> &String {
+        &self.input_file_path
     }
 
     pub fn get_extension(&self) -> &String {
